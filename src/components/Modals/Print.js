@@ -21,24 +21,17 @@ function Print({ open, onClose, groupedCandidates, voteCounts }) {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text("Vote Summary", 10, 10);
-
-    let currentY = 20; // Start position for tables
-
+    let currentY = 20;
     Object.keys(groupedCandidates).forEach((position, index) => {
       const positionTitle = `${position.toUpperCase()}`;
-
-      // Check if there's enough space on the current page for the title + table
       if (currentY + 1 > doc.internal.pageSize.height - 20) {
-        doc.addPage(); // Add a new page if there's no space left
-        currentY = 20; // Reset Y position for the new page
+        doc.addPage();
+        currentY = 20;
       }
-
-      // Add position title
       doc.setFontSize(14);
       // doc.text(positionTitle, 10, currentY);
-      currentY += 1; // Move Y down for the table
+      currentY += 1;
 
-      // Create rows for the table
       const tableData = groupedCandidates[position].map((candidate) => {
         const candidateVoteData = voteCounts[candidate.candidateID] || {};
         const totalVotes =
@@ -56,26 +49,21 @@ function Print({ open, onClose, groupedCandidates, voteCounts }) {
         return [candidate.name, totalVotes];
       });
 
-      // Add the table to the PDF
       doc.autoTable({
-        head: [[positionTitle, "Total Votes"]], // Use positionTitle dynamically
+        head: [[positionTitle, "Total Votes"]],
         body: tableData,
         startY: currentY,
         didDrawPage: (data) => {
-          // Update currentY for the next table
-          currentY = data.cursor.y + 10; // Add spacing after the table
+          currentY = data.cursor.y + 10;
         },
-        margin: { left: 10, right: 10 }, // Adjust margins to fit more content
+        margin: { left: 10, right: 10 },
       });
-
-      // Check if there's still space for another title; if not, add a new page
       if (currentY > doc.internal.pageSize.height - 20) {
         doc.addPage();
         currentY = 20;
       }
     });
 
-    // Save the PDF
     doc.save("VoteSummary.pdf");
   };
 
