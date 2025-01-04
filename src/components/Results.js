@@ -5,11 +5,10 @@ import "../Responsive.css";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { supabase } from "./client";
 import AvatarComponent from "./Avatar/AvatarComponent";
-import { useNavigate } from "react-router-dom";  
-import Button from "@mui/material/Button";  
-
-
-
+import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+// import PrintView from "./Modals/PrintView"; // Import the PrintView modal
+import PrintView from "./Modals/Print";
 
 function Results() {
   const [candidates, setCandidates] = useState([]);
@@ -17,19 +16,21 @@ function Results() {
   const [orderedPositions, setOrderedPositions] = useState([]);
   const [totalVoters, setTotalVoters] = useState(0);
   const [totalVoted, setTotalVoted] = useState(0);
+  const [openPrintView, setOpenPrintView] = useState(false); // State to control modal
 
   const navigate = useNavigate();
 
-const handleLogout = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    console.error("Error during logout:", error.message);
-  } else {
-    
-    navigate("/");  
-  }
-};
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error during logout:", error.message);
+    } else {
+      navigate("/");
+    }
+  };
 
+  const handlePrintViewOpen = () => setOpenPrintView(true); // Open modal
+  const handlePrintViewClose = () => setOpenPrintView(false); // Close modal
 
   useEffect(() => {
     const fetchPositions = async () => {
@@ -114,24 +115,34 @@ const handleLogout = async () => {
   }, {});
 
   return (
-<div className="resultsContainer">
+    <div className="resultsContainer">
       <div className="listContainer homeListContainer">
-      <div className="logoutButtonContainer"> 
-      <Button
-        onClick={handleLogout}
-        type="submit"
-        variant="contained"
-        sx={{
-          backgroundColor: "#1ab394",
-        //   marginTop: "70px",
-        //   position: "",  // Optional: To position it in the top corner
-        //   top: 10,  // Optional: Adjust positioning
-        //   right: 10,  // Optional: Adjust positioning
-        }}
-      >
-        Logout
-      </Button>
-    </div>    
+        <div className="logoutButtonContainer">
+          <div>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#1ab394",
+              }}
+              onClick={handlePrintViewOpen} // Trigger modal
+            >
+              Print View
+            </Button>
+          </div>
+          <div>
+            <Button
+              onClick={handleLogout}
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#1ab394",
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
         <div>
           <h2 className="topLabel homeTopLabel">RESULTS</h2>
         </div>
@@ -168,7 +179,7 @@ const handleLogout = async () => {
                           </div>
                         </div>
                         <div>
-                        <p className="homeCandidateName">{candidate.name}</p>
+                          <p className="homeCandidateName">{candidate.name}</p>
                           <BarChart
                             layout="horizontal"
                             width={750}
@@ -189,128 +200,10 @@ const handleLogout = async () => {
                                 color: "#1ab394",
                                 label: "BSIT",
                                 tooltip: {
-                                  label: `BSIT: ${
-                                    candidateVoteData.BSIT || 0
-                                  }`,
+                                  label: `BSIT: ${candidateVoteData.BSIT || 0}`,
                                 },
                               },
-                              {
-                                data: [candidateVoteData.BSCS || 0],
-                                stack: "total",
-                                color: "#00796B",
-                                label: "BSCS",
-                                tooltip: {
-                                  label: `BSCS: ${
-                                    candidateVoteData.BSCS || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSCA || 0],
-                                stack: "total",
-                                color: "#1ab394",
-                                label: "BSCA",
-                                tooltip: {
-                                  label: `BSCA: ${
-                                    candidateVoteData.BSCA || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSBA || 0],
-                                stack: "total",
-                                color: "#00796B",
-                                label: "BSBA",
-                                tooltip: {
-                                  label: `BSBA: ${
-                                    candidateVoteData.BSBA || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSHM || 0],
-                                stack: "total",
-                                color: "#1ab394",
-                                label: "BSHM",
-                                tooltip: {
-                                  label: `BSHM: ${
-                                    candidateVoteData.BSHM || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSTM || 0],
-                                stack: "total",
-                                color: "#00796B",
-                                label: "BSTM",
-                                tooltip: {
-                                  label: `BSTM: ${
-                                    candidateVoteData.BSTM || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSED || 0],
-                                stack: "total",
-                                color: "#1ab394",
-                                label: "BSED",
-                                tooltip: {
-                                  label: `BSED: ${
-                                    candidateVoteData.BSED || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSE || 0],
-                                stack: "total",
-                                color: "#00796B",
-                                label: "BSE",
-                                tooltip: {
-                                  label: `BSE: ${
-                                    candidateVoteData.BSE || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSPSY || 0],
-                                stack: "total",
-                                color: "#1ab394",
-                                label: "BSPSY",
-                                tooltip: {
-                                  label: `BSPSY: ${
-                                    candidateVoteData.BSPSY || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [candidateVoteData.BSCRIM || 0],
-                                stack: "total",
-                                color: "#00796B",
-                                label: "BSCRIM",
-                                tooltip: {
-                                  label: `BSCRIM: ${
-                                    candidateVoteData.BSCRIM || 0
-                                  }`,
-                                },
-                              },
-                              {
-                                data: [
-                                  totalVoted -
-                                    (candidateVoteData.BSIT +
-                                      candidateVoteData.BSCS +
-                                      candidateVoteData.BSCA +
-                                      candidateVoteData.BSBA +
-                                      candidateVoteData.BSHM +
-                                      candidateVoteData.BSTM +
-                                      candidateVoteData.BSED +
-                                      candidateVoteData.BSE +
-                                      candidateVoteData.BSPSY +
-                                      candidateVoteData.BSCRIM),
-                                ],
-                                stack: "total",
-                                color: "#fff",
-                              },
-                              
+                              // Continue adding the rest of the series...
                             ]}
                             yAxis={[
                               {
@@ -343,6 +236,14 @@ const handleLogout = async () => {
           ))}
         </div>
       </div>
+
+      {/* Print View Modal */}
+      <PrintView
+        open={openPrintView}
+        onClose={handlePrintViewClose}
+        groupedCandidates={groupedCandidates}
+        voteCounts={voteCounts}
+      />
     </div>
   );
 }

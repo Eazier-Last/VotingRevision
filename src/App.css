@@ -597,14 +597,11 @@ body {
   margin-bottom: 10px;
 }
 
-.homeCandidateName{
+.homeCandidateName {
   color: #0d6957;
-  text-align: left;padding-left: 20px;
+  text-align: left;
+  padding-left: 20px;
   font-weight: 600;
   line-height: 0;
   font-size: 1.2rem;
-  
-
 }
-
-

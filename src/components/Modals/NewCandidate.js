@@ -30,7 +30,6 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       setPosition(candidate.position || "");
       setAvatarUrl(candidate.avatarUrl || null);
     } else {
-      
       setCandidateName("");
       setSkills("");
       setDescription("");
@@ -38,7 +37,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       setPosition("");
       setAvatarUrl(null);
     }
-  }, [candidate]); 
+  }, [candidate]);
 
   const convertToBase64 = (file) => {
     const reader = new FileReader();
@@ -57,7 +56,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       console.error("Error fetching positions:", error);
       return;
     }
-    setPositions(data.map((pos) => pos.positions)); 
+    setPositions(data.map((pos) => pos.positions));
   };
 
   useEffect(() => {
@@ -90,7 +89,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       campaignObjective,
       position,
       avatarUrl,
-      candidateID: candidate?.candidateID, 
+      candidateID: candidate?.candidateID,
     };
 
     onSubmit(candidateData);
@@ -184,9 +183,9 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
               <div>
                 <TextField
                   id="outlined-multiline-static"
-                  label="Description"
-                  multiline
-                  rows={3}
+                  label="Political Party"
+                  // multiline
+                  // rows={3}
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}

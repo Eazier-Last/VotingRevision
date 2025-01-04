@@ -28,7 +28,7 @@ function Home() {
   const [totalVoted, setTotalVoted] = useState(0);
   const [courseData, setCourseData] = useState([]);
   const [orderedPositions, setOrderedPositions] = useState([]);
-  const [studentEmail, setStudentEmail] = useState(""); // To hold the student's email
+  const [studentEmail, setStudentEmail] = useState("");
 
   const storedTimerState = JSON.parse(localStorage.getItem("timerState")) || {};
   const [time, setTime] = useState(
@@ -60,17 +60,17 @@ function Home() {
 
   const form = useRef();
 
-  const [allEmails, setAllEmails] = useState([]); 
+  const [allEmails, setAllEmails] = useState([]);
 
   useEffect(() => {
     const fetchAllEmails = async () => {
-      const { data, error } = await supabase.from("users").select("gmail"); 
+      const { data, error } = await supabase.from("users").select("gmail");
 
       if (error) {
         console.error("Error fetching user emails:", error);
         setAllEmails([]);
       } else {
-        const emails = data.map((user) => user.gmail).filter((email) => email); 
+        const emails = data.map((user) => user.gmail).filter((email) => email);
         setAllEmails(emails);
       }
     };
@@ -81,7 +81,6 @@ function Home() {
   const sendEmail = async (e) => {
     e.preventDefault();
 
-    
     const { data: users, error } = await supabase
       .from("users")
       .select("name, studentNumber, password, gmail");
@@ -97,16 +96,15 @@ function Home() {
       return;
     }
 
-    
     for (const user of users) {
       if (user.gmail) {
         try {
           await emailjs.send(
-            "service_ffx6rwz", 
-            "template_171uqr7", 
+            "service_ffx6rwz",
+            "template_171uqr7",
             {
-              student_email: user.gmail, 
-              subject: form.current.subject.value, 
+              student_email: user.gmail,
+              subject: form.current.subject.value,
               message: form.current.message.value.replace(
                 /{name}|{studentNumber}|{password}/g,
                 (match) => {
@@ -121,9 +119,9 @@ function Home() {
                       return match;
                   }
                 }
-              ), 
+              ),
             },
-            "DFxzih1aS0PB7dD9M" 
+            "DFxzih1aS0PB7dD9M"
           );
 
           console.log(`Email sent successfully to ${user.gmail}`);
@@ -138,18 +136,18 @@ function Home() {
 
   useEffect(() => {
     const fetchUserEmail = async () => {
-      const studentNumber = "12345"; 
+      const studentNumber = "12345";
       const { data, error } = await supabase
         .from("users")
         .select("gmail")
         .eq("studentNumber", studentNumber)
-        .single(); 
+        .single();
 
       if (error) {
         console.error("Error fetching user email:", error);
-        setStudentEmail(""); 
+        setStudentEmail("");
       } else {
-        setStudentEmail(data.gmail); 
+        setStudentEmail(data.gmail);
       }
     };
 
@@ -172,10 +170,7 @@ function Home() {
             return { days: 10, hours: 10, minutes: 10, seconds: 0 };
           }
 
-          const newTotalSeconds =
-            totalSeconds -
-            
-            0;
+          const newTotalSeconds = totalSeconds - 0;
           const newDays = Math.floor(newTotalSeconds / 86400);
           const newHours = Math.floor((newTotalSeconds % 86400) / 3600);
           const newMinutes = Math.floor((newTotalSeconds % 3600) / 60);
@@ -273,26 +268,74 @@ function Home() {
     fetchVoterStats();
   }, []);
 
+  const handleReset = async () => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm(
+      "Are you sure you want to reset the votes?"
+    );
+
+    if (!isConfirmed) {
+      return; // If the user cancels, stop the reset operation
+    }
+
+    try {
+      // Reset vote counts in the voteCountManage table
+      const { data: voteCountData, error: voteCountError } = await supabase
+        .from("voteCountManage")
+        .update({
+          BSIT: 0,
+          BSBA: 0,
+          BSHM: 0,
+          BSTM: 0,
+          BSE: 0,
+          BSED: 0,
+          BSPSY: 0,
+          BSCRIM: 0,
+          BSCS: 0,
+          BSCA: 0,
+        })
+        .not("id", "is", null); // Updates rows where "id" is NOT null.
+
+      if (voteCountError) {
+        throw new Error(voteCountError.message);
+      }
+      console.log("Vote counts have been reset:", voteCountData);
+
+      // Reset voteStatus in the users table
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .update({ voteStatus: null }) // Set voteStatus to NULL
+        .not("id", "is", null); // Updates rows where "id" is NOT null.
+
+      if (userError) {
+        throw new Error(userError.message);
+      }
+      console.log("User voteStatus has been reset:", userData);
+
+      alert("Vote counts and user voteStatus have been reset.");
+    } catch (error) {
+      console.error("Error resetting data:", error);
+      alert(`Error resetting data: ${error.message}`);
+    }
+  };
+
   const handleStartStop = async () => {
     try {
       if (isRunning) {
-        
         clearInterval(intervalRef.current);
         setIsRunning(false);
 
-        
         const { data, error } = await supabase
           .from("timerState")
-          .update({ isRunning: 0 }) 
-          .eq("id", 1); 
+          .update({ isRunning: 0 })
+          .eq("id", 1);
 
         if (error) {
           throw new Error(error.message || "Error updating timer state (STOP)");
         }
 
-        console.log("Timer state updated to STOP in Supabase:", data); 
+        console.log("Timer state updated to STOP in Supabase:", data);
       } else {
-        
         intervalRef.current = setInterval(() => {
           setTime((prevTime) => {
             const totalSeconds =
@@ -317,11 +360,10 @@ function Home() {
         }, 1000);
         setIsRunning(true);
 
-        
         const { data, error } = await supabase
           .from("timerState")
-          .update({ isRunning: 1 }) 
-          .eq("id", 1); 
+          .update({ isRunning: 1 })
+          .eq("id", 1);
 
         if (error) {
           throw new Error(
@@ -479,6 +521,27 @@ function Home() {
               >
                 {isRunning ? "STOP" : "START"}
               </Button>
+              <Button
+                style={{ width: "100%" }}
+                variant="outlined"
+                sx={{
+                  backgroundColor: "red",
+                  marginTop: "10px",
+                  borderWidth: "5px",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "red",
+                  },
+                  borderColor: "red",
+                  borderRadius: "10px",
+                  fontSize: "2rem",
+                  height: "50px",
+                }}
+                onClick={handleReset} // Attach the reset handler here
+              >
+                RESET
+              </Button>
             </div>
             <div className="voters">
               <label className="numVoter">
@@ -613,14 +676,14 @@ function Home() {
                                   width: "55px",
                                   borderRadius: "50%",
                                 }}
-                                
                                 imgSrc={candidate.avatarUrl}
                               />
-                             
                             </div>
                           </div>
                           <div>
-                          <p className="homeCandidateName">{candidate.name}</p>
+                            <p className="homeCandidateName">
+                              {candidate.name}
+                            </p>
                             <BarChart
                               layout="horizontal"
                               width={850}
@@ -760,7 +823,6 @@ function Home() {
                                   stack: "total",
                                   color: "#fff",
                                 },
-                                
                               ]}
                               yAxis={[
                                 {
