@@ -67,7 +67,7 @@ function CandidateVoteInfo({ open, onClose, candidateInfo }) {
                   className="candidateDescription"
                   style={{ marginBottom: "10px" }}
                 >
-                  <strong>Description:</strong>
+                  <strong>Party List:</strong>
                   <p>{description}</p>
                 </div>
               )}

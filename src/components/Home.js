@@ -625,7 +625,7 @@ function Home() {
                     required
                     sx={{ width: "30ch" }}
                     defaultValue={
-                      "Hello {name},\n\nHere are your credentials:\nStudent Number: {studentNumber}\nPassword: {password}\n\nThank you!"
+                      "Hello {name},\n\nHere is the Result of\n\nThank you!"
                     }
                   />
                 </div>

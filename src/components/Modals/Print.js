@@ -16,21 +16,37 @@ import "jspdf-autotable";
 import "./Modals.css";
 import "../../Responsive.css";
 
-function Print({ open, onClose, groupedCandidates, voteCounts }) {
-  const handleDownload = () => {
+function Print({
+  open,
+  onClose,
+  groupedCandidates,
+  voteCounts,
+  onGeneratePDF,
+}) {
+  // Function to generate the PDF and return it as a Base64 string
+  const handleGeneratePDF = () => {
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Vote Summary", 10, 10);
-    let currentY = 20;
-    Object.keys(groupedCandidates).forEach((position, index) => {
+    const pageWidth = doc.internal.pageSize.width;
+
+    // Header
+    doc.setFontSize(18);
+    doc.text("Student Council Election Results", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    let currentY = 30;
+
+    Object.keys(groupedCandidates).forEach((position) => {
       const positionTitle = `${position.toUpperCase()}`;
-      if (currentY + 1 > doc.internal.pageSize.height - 20) {
+      if (currentY + 1 > doc.internal.pageSize.height - 40) {
         doc.addPage();
-        currentY = 20;
+        currentY = 30;
+        doc.text("Student Council Election Results", pageWidth / 2, 15, {
+          align: "center",
+        });
       }
+
       doc.setFontSize(14);
-      // doc.text(positionTitle, 10, currentY);
-      currentY += 1;
 
       const tableData = groupedCandidates[position].map((candidate) => {
         const candidateVoteData = voteCounts[candidate.candidateID] || {};
@@ -58,13 +74,24 @@ function Print({ open, onClose, groupedCandidates, voteCounts }) {
         },
         margin: { left: 10, right: 10 },
       });
-      if (currentY > doc.internal.pageSize.height - 20) {
+
+      if (currentY > doc.internal.pageSize.height - 40) {
         doc.addPage();
-        currentY = 20;
+        currentY = 30;
+        doc.text("Student Council Election Results", pageWidth / 2, 15, {
+          align: "center",
+        });
       }
     });
 
-    doc.save("VoteSummary.pdf");
+    // Convert the PDF to Base64
+    return doc.output("datauristring");
+  };
+
+  // Button to trigger PDF generation
+  const handleDownload = () => {
+    const pdfData = handleGeneratePDF();
+    onGeneratePDF(pdfData); // Pass the Base64 PDF to the parent component
   };
 
   return (
